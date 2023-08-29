@@ -1,4 +1,5 @@
 streamlit
+openai
 beautifulsoup4
 requests
 streamlit-chat
