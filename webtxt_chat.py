@@ -12,7 +12,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 
-
+#ページの初期設定。タイトルやアイコンを設定。
 def init_page():
     st.set_page_config(
         page_title="Website Summarizer",
@@ -21,7 +21,7 @@ def init_page():
     st.header("Website Summarizer 🤗")
     st.sidebar.title("Options")
 
-
+#チャットメッセージを初期化。ボタンもこの中で設定。
 def init_messages():
     clear_button = st.sidebar.button("Clear Conversation", key="clear")
     if clear_button or "messages" not in st.session_state:
@@ -30,7 +30,7 @@ def init_messages():
         ]
         st.session_state.costs = []
 
-
+#ユーザーが選択した言語モデル（GPT-3.5 または GPT-4）を返す。
 def select_model():
     model = st.sidebar.radio("Choose a model:", ("GPT-3.5", "GPT-4"))
     if model == "GPT-3.5":
@@ -40,12 +40,12 @@ def select_model():
 
     return ChatOpenAI(temperature=0, model_name=model_name)
 
-
+#ユーザーからのURL入力を取得。
 def get_url_input():
     url = st.text_input("URL: ", key="input")
     return url
 
-
+#入力されたURLが有効かどうかチェック。
 def validate_url(url):
     try:
         result = urlparse(url)
@@ -53,7 +53,7 @@ def validate_url(url):
     except ValueError:
         return False
 
-
+#URLからコンテンツをスクレイピング。
 def get_content(url):
     try:
         with st.spinner("Fetching Content ..."):
@@ -70,7 +70,7 @@ def get_content(url):
         st.write('something wrong')
         return None
 
-
+#要約を依頼するためのプロンプトを作成。
 def build_prompt(content, n_chars=300):
     return f"""以下はとある。Webページのコンテンツである。内容を{n_chars}程度でわかりやすく要約してください。
 
@@ -83,12 +83,19 @@ def build_prompt(content, n_chars=300):
 日本語で書いてね！
 """
 
-
+#GPTモデルによる要約を取得。
 def get_answer(llm, messages):
     with get_openai_callback() as cb:
         answer = llm(messages)
     return answer.content, cb.total_cost
 
+# 1.流れ：
+# 2.ページとメッセージを初期化。
+# 3.言語モデルを選択。
+# 4.URLを入力。
+# 5.URLが有効であれば、そのページの内容を取得。
+# 6.コンテンツをGPTモデルに要約させる。
+# 7. 要約を表示。
 
 def main():
     init_page()
